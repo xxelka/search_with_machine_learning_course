@@ -1,5 +1,55 @@
 {
   "settings": {
-    "index.refresh_interval": "5s"
+    "index.refresh_interval": "5s",
+    "number_of_shards": 2
+  },
+  "mappings": {
+    "properties": {
+        "name": {
+          "type": "text",
+          "analyzer": "english", 
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+          "shortDescription": {
+          "type": "text",
+          "analyzer": "english", 
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "longDescription": {
+          "type": "text",
+          "analyzer": "english", 
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "color": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "regularPrice": {
+          "type": "double"
+        },
+        "salePrice": {
+          "type": "double"
+        }
+    }
   }
 }
