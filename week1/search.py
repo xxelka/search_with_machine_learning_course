@@ -23,17 +23,37 @@ def process_filters(filters_input):
     for filter in filters_input:
         type = request.args.get(filter + ".type")
         display_name = request.args.get(filter + ".displayName", filter)
-        #
-        # We need to capture and return what filters are already applied so they can be automatically added to any existing links we display in aggregations.jinja2
-        applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}".format(filter, filter, type, filter,
-                                                                                 display_name)
+        
+
         # TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
         # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
-        if type == "range":
-            pass
-        elif type == "terms":
-            pass  # TODO: IMPLEMENT
-    print("Filters: {}".format(filters))
+        if type == "range":     
+            value_from = request.args.get(filter + ".from")
+            value_to = request.args.get(filter + ".to")
+            key = request.args.get(filter + ".key")
+            option = {
+                "range": {
+                    "regularPrice": {
+                        "gte": None if value_from == "" else value_from,
+                        "lte": None if value_to == "" else value_to
+                        }
+                    }
+                }
+            filters.append(option)
+            display_filters.append(key)    
+
+            # We need to capture and return what filters are already applied so they can be automatically added to any existing links we display in aggregations.jinja2
+            applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}&{}.from={}&{}.to={}&{}.key={}".format(filter, filter, type, filter,
+                                                                                 display_name,filter,value_from, filter,value_to,filter,key)
+        elif type == "terms":             
+            value = request.args.get(filter + ".key")
+            option = {
+                "terms": { "department.keyword": [ value ] }
+                }
+            filters.append(option)
+            display_filters.append(value)
+            applied_filters += "&filter.name={}&{}.type={}&{}.displayName={}&{}.key={}".format(filter, filter, type, filter,
+                                                                                 display_name,filter,value) 
 
     return filters, display_filters, applied_filters
 
@@ -82,7 +102,7 @@ def query():
     )
     # Postprocess results here if you so desire
 
-    print('RESPONSE', response)
+    # print('RESPONSE', response)
     if error is None:
         return render_template("search_results.jinja2", query=user_query, search_response=response,
                                display_filters=display_filters, applied_filters=applied_filters,
@@ -101,10 +121,19 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
             }
         }
 
+   
     query_obj = {
         'size': 10,
         "_source": ["productId", "name", "image", "shortDescription", "longDescription", "department", "salesRankShortTerm",  "salesRankMediumTerm", "salesRankLongTerm", "regularPrice", "categoryPath"],
-        "query": es_all_query if user_query == "*" else es_user_query,
+        # "query": es_all_query if user_query == "*" else es_user_query,
+        "query": {
+            "bool": {
+                "filter": filters ,
+                "must": [
+                   es_all_query if user_query == "*" else es_user_query
+                ]
+            }
+        },
         "highlight": {
             "fields": {
                 "shortDescription": {},

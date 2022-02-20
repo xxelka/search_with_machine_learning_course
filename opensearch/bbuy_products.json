@@ -1,7 +1,6 @@
 {
   "settings": {
-    "index.refresh_interval": "5s",
-    "number_of_shards": 2
+    "index.refresh_interval": "5s"
   },
   "mappings": {
     "properties": {
@@ -45,10 +44,12 @@
           }
         },
         "regularPrice": {
-          "type": "double"
+          "type": "scaled_float",
+          "scaling_factor": 100
         },
         "salePrice": {
-          "type": "double"
+          "type": "scaled_float",
+          "scaling_factor": 100
         }
     }
   }
