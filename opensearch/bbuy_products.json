@@ -50,6 +50,15 @@
         "salePrice": {
           "type": "scaled_float",
           "scaling_factor": 100
+        },
+        "salesRankShortTerm": {
+          "type": "double"
+        },
+        "salesRankMediumTerm": {
+          "type": "double"
+        },
+        "salesRankLongTerm": {
+          "type": "double"
         }
     }
   }

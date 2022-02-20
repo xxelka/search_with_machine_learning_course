@@ -115,17 +115,50 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
     es_all_query = {'match_all': {}}
     es_user_query = {
-            "multi_match": {
-                'query': user_query,
-                'fields': ['name', 'shortDescription', 'longDescription']
-            }
+          "function_score": {
+            "query": {
+              "query_string": {
+                "query": user_query,
+                "fields": [
+                  "name^1000",
+                  "shortDescription^50",
+                  "longDescription^10",
+                  "department"
+                ]
+              }
+            },
+            "boost_mode": "replace",
+            "score_mode": "avg",
+            "functions": [
+              {
+                "field_value_factor": {
+                  "field": "salesRankShortTerm",
+                  "modifier": "reciprocal",
+                  "missing": 100000000
+                }
+              },
+              {
+                "field_value_factor": {
+                  "field": "salesRankMediumTerm",
+                  "modifier": "reciprocal",
+                  "missing": 100000000
+                }
+              },
+              {
+                "field_value_factor": {
+                  "field": "salesRankLongTerm",
+                  "modifier": "reciprocal",
+                  "missing": 100000000
+                }
+              }
+            ]
+          }
         }
 
    
     query_obj = {
         'size': 10,
         "_source": ["productId", "name", "image", "shortDescription", "longDescription", "department", "salesRankShortTerm",  "salesRankMediumTerm", "salesRankLongTerm", "regularPrice", "categoryPath"],
-        # "query": es_all_query if user_query == "*" else es_user_query,
         "query": {
             "bool": {
                 "filter": filters ,
@@ -153,26 +186,26 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                     "ranges": [
                         {
                             "key": "$",
-                            "to": 10
-                        },
-                        {
-                            "key": "$$",
-                            "from": 10,
                             "to": 25
                         },
                         {
-                            "key": "$$$",
+                            "key": "$$",
                             "from": 25,
-                            "to": 50
+                            "to": 75
+                        },
+                        {
+                            "key": "$$$",
+                            "from": 75,
+                            "to": 120
                         },
                          {
                             "key": "$$$$",
-                            "from": 50,
-                            "to": 100
+                            "from": 120,
+                            "to": 175
                         },
                          {
                             "key": "$$$$$",
-                            "from": 100
+                            "from": 175
                         }
                     ]
                 }
