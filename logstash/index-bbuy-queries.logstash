@@ -13,7 +13,7 @@ filter {
       "click_time" => "date_time"
       "query_time" => "date_time"
     }
-  },
+  }
   date {
     match => [ "click_time", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS" ]
     target => "click_time"
