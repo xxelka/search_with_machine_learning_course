@@ -307,5 +307,9 @@ class DataPrepper:
 
     # Determine the number of clicks for this sku given a query (represented by the click group)
     def __num_clicks(self, all_skus_for_query, test_sku):
-        print("IMPLEMENT ME: __num_clicks(): Return how many clicks the given sku received in the set of skus passed ")
-        return 0
+        print("DONE IMPLEMENT ME: __num_clicks(): Return how many clicks the given sku received in the set of skus passed ")
+        count = 0
+        for qsku in all_skus_for_query:
+            if qsku == test_sku:
+                count = count + 1
+        return count
