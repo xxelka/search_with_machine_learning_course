@@ -3,9 +3,19 @@ import os
 import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import nltk
+from nltk.stem import SnowballStemmer
+from nltk import sent_tokenize, word_tokenize
+
+snowball = SnowballStemmer("english")
+nltk.download('punkt')
 
 def transform_name(product_name):
-    # IMPLEMENT
+    tokens = word_tokenize(product_name)
+    tokens = [word for word in tokens if word.isalpha()]
+    tokens = [word.lower() for word in tokens]
+    tokens = [snowball.stem(word) for word in tokens]
+    product_name = " ".join(tokens)
     return product_name
 
 # Directory for product data
