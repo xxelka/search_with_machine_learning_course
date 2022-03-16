@@ -18,6 +18,7 @@ def transform_name(product_name):
     product_name = " ".join(tokens)
     return product_name
 
+
 # Directory for product data
 directory = r'/workspace/search_with_machine_learning_course/data/pruned_products/'
 
