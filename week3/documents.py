@@ -10,6 +10,8 @@ import json
 
 bp = Blueprint('documents', __name__, url_prefix='/documents')
 
+threshold=0.91
+
 # Take in a JSON document and return a JSON document
 @bp.route('/annotate', methods=['POST'])
 def annotate():
@@ -26,5 +28,7 @@ def annotate():
                 if item == "name":
                     if syns_model is not None:
                         print("IMPLEMENT ME: call nearest_neighbors on your syn model and return it as `name_synonyms`")
+                        nns = syns_model.get_nearest_neighbors(transform_name(the_text))
+                        response["name_synonyms"] = [nn[1] for nn in nns if nn[0] > threshold] 
         return jsonify(response)
     abort(415)
