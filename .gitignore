@@ -1,3 +1,8 @@
+data/pruned_products/*.xml
+data/computer_products/*
+cooking*
+*.bin
+
 data/phone_products/phone_products.xml
 output/
 logstash-*

@@ -3,9 +3,19 @@ import os
 import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import nltk
+from nltk.stem import SnowballStemmer
+from nltk import sent_tokenize, word_tokenize
+
+snowball = SnowballStemmer("english")
+nltk.download('punkt')
 
 def transform_name(product_name):
-    # IMPLEMENT
+    tokens = word_tokenize(product_name)
+    tokens = [word for word in tokens if word.isalpha()]
+    tokens = [word.lower() for word in tokens]
+    tokens = [snowball.stem(word) for word in tokens]
+    product_name = " ".join(tokens)
     return product_name
 
 # Directory for product data
@@ -22,6 +32,8 @@ general.add_argument("--sample_rate", default=1.0, type=float, help="The rate at
 # IMPLEMENT: Setting min_products removes infrequent categories and makes the classifier's task easier.
 general.add_argument("--min_products", default=0, type=int, help="The minimum number of products per category (default is 0).")
 
+general.add_argument("--level_depth", default=10, type=int, help="The number of levels into the category tree we parse (default is 10).")
+
 args = parser.parse_args()
 output_file = args.output
 path = Path(output_file)
@@ -34,6 +46,8 @@ if args.input:
 # IMPLEMENT:  Track the number of items in each category and only output if above the min
 min_products = args.min_products
 sample_rate = args.sample_rate
+level_depth = args.level_depth
+categories = []
 
 print("Writing results to %s" % output_file)
 with open(output_file, 'w') as output:
